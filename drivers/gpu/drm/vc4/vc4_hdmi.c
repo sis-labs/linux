@@ -166,8 +166,6 @@ vc4_hdmi_connector_detect(struct drm_connector *connector, bool force)
 	struct drm_device *dev = connector->dev;
 	struct vc4_dev *vc4 = to_vc4_dev(dev);
 
-	return connector_status_connected;
-
 	if (vc4->hdmi->hpd_gpio) {
 		if (gpio_get_value_cansleep(vc4->hdmi->hpd_gpio) ^
 		    vc4->hdmi->hpd_active_low)
@@ -175,6 +173,9 @@ vc4_hdmi_connector_detect(struct drm_connector *connector, bool force)
 		else
 			return connector_status_disconnected;
 	}
+
+	if (drm_probe_ddc(vc4->hdmi->ddc))
+		return connector_status_connected;
 
 	if (HDMI_READ(VC4_HDMI_HOTPLUG) & VC4_HDMI_HOTPLUG_CONNECTED)
 		return connector_status_connected;
@@ -467,12 +468,6 @@ static int vc4_hdmi_bind(struct device *dev, struct device *master, void *data)
 	if (IS_ERR(hdmi->hd_regs))
 		return PTR_ERR(hdmi->hd_regs);
 
-	ddc_node = of_parse_phandle(dev->of_node, "ddc", 0);
-	if (!ddc_node) {
-		DRM_ERROR("Failed to find ddc node in device tree\n");
-		return -ENODEV;
-	}
-
 	hdmi->pixel_clock = devm_clk_get(dev, "pixel");
 	if (IS_ERR(hdmi->pixel_clock)) {
 		DRM_ERROR("Failed to get pixel clock\n");
@@ -484,7 +479,14 @@ static int vc4_hdmi_bind(struct device *dev, struct device *master, void *data)
 		return PTR_ERR(hdmi->hsm_clock);
 	}
 
+	ddc_node = of_parse_phandle(dev->of_node, "ddc", 0);
+	if (!ddc_node) {
+		DRM_ERROR("Failed to find ddc node in device tree\n");
+		return -ENODEV;
+	}
+
 	hdmi->ddc = of_find_i2c_adapter_by_node(ddc_node);
+	of_node_put(ddc_node);
 	if (!hdmi->ddc) {
 		DRM_DEBUG("Failed to get ddc i2c adapter by node\n");
 		return -EPROBE_DEFER;
