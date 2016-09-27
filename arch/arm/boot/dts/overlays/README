@@ -235,6 +235,26 @@ Params: 24db_digital_gain       Allow gain to be applied via the PCM512x codec
                                 that does not result in clipping/distortion!)
 
 
+Name:   allo-piano-dac-pcm512x-audio
+Info:   Configures the Allo Piano DAC (2.0/2.1) audio cards.
+        (NB. This initial support is for 2.0 channel audio ONLY! ie. stereo.
+        The subwoofer outputs on the Piano 2.1 are not currently supported!)
+Load:   dtoverlay=allo-piano-dac-pcm512x-audio,<param>
+Params: 24db_digital_gain       Allow gain to be applied via the PCM512x codec
+                                Digital volume control.
+                                (The default behaviour is that the Digital
+                                volume control is limited to a maximum of
+                                0dB. ie. it can attenuate but not provide
+                                gain. For most users, this will be desired
+                                as it will prevent clipping. By appending
+                                the 24db_digital_gain parameter, the Digital
+                                volume control will allow up to 24dB of
+                                gain. If this parameter is enabled, it is the
+                                responsibility of the user to ensure that
+                                the Digital volume control is set to a value
+                                that does not result in clipping/distortion!)
+
+
 Name:   at86rf233
 Info:   Configures the Atmel AT86RF233 802.15.4 low-power WPAN transceiver,
         connected to spi0.0
@@ -280,6 +300,14 @@ Params: gpiopin                 GPIO connected to the sensor's DATA output.
 Name:   dionaudio-loco
 Info:   Configures the Dion Audio LOCO DAC-AMP
 Load:   dtoverlay=dionaudio-loco
+Params: <None>
+
+
+Name:   dpi18
+Info:   Overlay for a generic 18-bit DPI display
+        This uses GPIOs 0-21 (so no I2C, uart etc.), and activates the output
+        2-3 seconds after the kernel has started.
+Load:   dtoverlay=dpi18
 Params: <None>
 
 
@@ -826,6 +854,18 @@ Params: speed                   Display SPI bus speed
         debug                   Debug output level {0-7}
 
 
+Name:   pitft35-resistive
+Info:   Adafruit PiTFT 3.5" resistive touch screen
+Load:   dtoverlay=pitft35-resistive,<param>=<val>
+Params: speed                   Display SPI bus speed
+
+        rotate                  Display rotation {0,90,180,270}
+
+        fps                     Delay between frame updates
+
+        debug                   Debug output level {0-7}
+
+
 Name:   pps-gpio
 Info:   Configures the pps-gpio (pulse-per-second time signal via GPIO).
 Load:   dtoverlay=pps-gpio,<param>=<val>
@@ -1205,6 +1245,17 @@ Load:   dtoverlay=uart1,<param>=<val>
 Params: txd1_pin                GPIO pin for TXD1 (14, 32 or 40 - default 14)
 
         rxd1_pin                GPIO pin for RXD1 (15, 33 or 41 - default 15)
+
+
+Name:   vc4-fkms-v3d
+Info:   Enable Eric Anholt's DRM VC4 V3D driver on top of the dispmanx
+        display stack.
+Load:   dtoverlay=vc4-fkms-v3d,<param>
+Params: cma-256                 CMA is 256MB, 256MB-aligned (needs 1GB)
+        cma-192                 CMA is 192MB, 256MB-aligned (needs 1GB)
+        cma-128                 CMA is 128MB, 128MB-aligned
+        cma-96                  CMA is 96MB, 128MB-aligned
+        cma-64                  CMA is 64MB, 64MB-aligned
 
 
 Name:   vc4-kms-v3d
